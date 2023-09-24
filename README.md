@@ -15,3 +15,11 @@ Un sistema de invernadero basado en MQTT y HTTP es una solución tecnológica qu
 7. **Lógica de Control**: El servidor central también incorpora una lógica de control que puede tomar decisiones automatizadas basadas en los datos recopilados. Por ejemplo, puede activar sistemas de riego cuando la humedad del suelo cae por debajo de un umbral específico.
 
 En resumen, un sistema de invernadero basado en MQTT y HTTP combina la eficiencia de la comunicación MQTT para la adquisición de datos de sensores y control de actuadores con una interfaz de usuario web amigable para que los usuarios supervisen y gestionen su invernadero de manera remota. Esto facilita la optimización de las condiciones ambientales y el aumento de la productividad en la agricultura o el cultivo de plantas en invernaderos.
+
+
+
+![Captura de pantalla (54)](https://github.com/Gualbertokuchay/Invernadero/assets/90735517/c4c5afb5-e5e1-41e7-87ef-bb76c73214b8)
+
+![Captura de pantalla (53)](https://github.com/Gualbertokuchay/Invernadero/assets/90735517/711b1b52-b17b-47f2-b1d3-4e5d4af3b8be)
+
+![Captura de pantalla 2023-09-24 103302](https://github.com/Gualbertokuchay/Invernadero/assets/90735517/d1e454cb-b5d2-4455-83c6-3c6766d35f60)
