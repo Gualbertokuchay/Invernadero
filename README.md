@@ -17,6 +17,6 @@ En resumen, un sistema de invernadero basado en MQTT y HTTP combina la eficienci
 
 https://github.com/Gualbertokuchay/Invernadero/assets/90735517/25ba4ac9-494a-4335-8b1c-f4a1a7dab5d1
 
-![Captura de pantalla 2023-09-24 105308](https://github.com/Gualbertokuchay/Invernadero/assets/90735517/0ac7140e-6aeb-4ed9-bcb4-c8845bd940f6)
-![Captura de pantalla 2023-09-24 105253](https://github.com/Gualbertokuchay/Invernadero/assets/90735517/bbb8f43f-9277-46f6-82d1-01f389b22637)
-![Captura de pantalla 2023-09-26 134935](https://github.com/Gualbertokuchay/Invernadero/assets/90735517/a1033f0c-fd22-4ce6-94ff-9d91f6e976c9)
+            ![Captura de pantalla 2023-09-24 105308](https://github.com/Gualbertokuchay/Invernadero/assets/90735517/0ac7140e-6aeb-4ed9-bcb4-c8845bd940f6)
+            ![Captura de pantalla 2023-09-24 105253](https://github.com/Gualbertokuchay/Invernadero/assets/90735517/bbb8f43f-9277-46f6-82d1-01f389b22637)
+            ![Captura de pantalla 2023-09-26 134935](https://github.com/Gualbertokuchay/Invernadero/assets/90735517/a1033f0c-fd22-4ce6-94ff-9d91f6e976c9)
