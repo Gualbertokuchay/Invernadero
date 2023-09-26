@@ -15,10 +15,8 @@ class _ConexionApiState extends State<ConexionApi> {
   List<bool> _isLuzOnList = [];
   List<bool> _isVentilacionOnList = [];
   List<bool> _isRiegoOnList = [];
-  List<bool> _isSensoresTemperaturaOnList = [];
-  List<bool> _isHumedadOnList = [];
-  List<double> _temperaturaValues = [0.0, 0.0, 0.0];
-  List<double> _humedadValues = [0.0, 0.0, 0.0];
+  double _temperaturaValue = 0.0;
+  double _humedadValue = 0.0;
 
   @override
   void initState() {
@@ -27,7 +25,7 @@ class _ConexionApiState extends State<ConexionApi> {
   }
 
   void initializeMqtt() {
-    client = MqttServerClient('broker.emqx.io', 'mqttx_eb5cefaf');
+    client = MqttServerClient('broker.emqx.io', 'mqttx_f39c405a');
     client.port = 1883;
     client.logging(on: true);
     client.onConnected = _onConnected;
@@ -48,8 +46,6 @@ class _ConexionApiState extends State<ConexionApi> {
     _isLuzOnList = List.generate(3, (index) => false);
     _isVentilacionOnList = List.generate(3, (index) => false);
     _isRiegoOnList = List.generate(3, (index) => false);
-    _isSensoresTemperaturaOnList = List.generate(3, (index) => false);
-    _isHumedadOnList = List.generate(3, (index) => false);
 
     connectToMqtt();
   }
@@ -76,6 +72,9 @@ class _ConexionApiState extends State<ConexionApi> {
     try {
       await client.connect();
       print('Connected to MQTT broker');
+      // Suscribirse a los tópicos de temperatura y humedad
+      client.subscribe('sensordetemperatura', MqttQos.atLeastOnce);
+      client.subscribe('sensordehumedad', MqttQos.atLeastOnce);
     } catch (e) {
       print('Exception: $e');
       client.disconnect();
@@ -88,8 +87,16 @@ class _ConexionApiState extends State<ConexionApi> {
 
       print('Received message: $payload from topic: ${c[0].topic}>');
 
-      // Aquí deberías procesar los mensajes MQTT y actualizar _temperaturaValues y _humedadValues
-      // en función de los valores recibidos.
+      // Actualizar los valores de temperatura y humedad cuando se recibe un mensaje
+      if (c[0].topic == 'sensordetemperatura') {
+        setState(() {
+          _temperaturaValue = double.tryParse(payload) ?? 0.0;
+        });
+      } else if (c[0].topic == 'sensordehumedad') {
+        setState(() {
+          _humedadValue = double.tryParse(payload) ?? 0.0;
+        });
+      }
     });
   }
 
@@ -106,40 +113,24 @@ class _ConexionApiState extends State<ConexionApi> {
   void toggleLuz(int index, bool newValue) {
     _isLuzOnList[index] = newValue;
     String message = newValue ? '1' : '0';
-    String area = 'Iluminación';
+    String area = 'iluminacion';
     publishMessage(message, 'iluminacion', area);
     setState(() {});
   }
 
   void toggleVentilacion(int index, bool newValue) {
     _isVentilacionOnList[index] = newValue;
-    String message = newValue ? '1' : '0';
-    String area = 'Ventilación';
-    publishMessage(message, 'ventilacion1', area);
+    String message = newValue ? '2' : '3';
+    String area = 'ventilacion1';
+    publishMessage(message, 'ventilacion1$index', area);
     setState(() {});
   }
 
   void toggleRiego(int index, bool newValue) {
     _isRiegoOnList[index] = newValue;
-    String message = newValue ? '1' : '0';
+    String message = newValue ? '4' : '5';
     String area = 'Sistema de Riego';
     publishMessage(message, 'sistemaderiego', area);
-    setState(() {});
-  }
-
-  void toggleSensoresTemperatura(int index, bool newValue) {
-    _isSensoresTemperaturaOnList[index] = newValue;
-    String message = newValue ? '1' : '0';
-    String area = 'Temperatura';
-    publishMessage(message, 'sensor:temperatura', area);
-    setState(() {});
-  }
-
-  void toggleHumedad(int index, bool newValue) {
-    _isHumedadOnList[index] = newValue;
-    String message = newValue ? '1' : '0';
-    String area = 'Humedad';
-    publishMessage(message, 'sensor:humedad', area);
     setState(() {});
   }
 
@@ -154,82 +145,139 @@ class _ConexionApiState extends State<ConexionApi> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text("Panel de Control"),
-        centerTitle: true,
-        backgroundColor: Colors.transparent,
-      ),
-      body: SingleChildScrollView(
-        child: GridView.builder(
-          shrinkWrap: true,
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 3,
-            childAspectRatio: 1.4,
+        backgroundColor: Colors.white,
+        title: Text(
+          "Paneles de Control",
+          style: TextStyle(
+            color: Colors.black, // Texto negro
           ),
-          itemCount: 15,
-          itemBuilder: (context, index) {
-            if (index < 3) {
-              return _buildCard(
-                  index, _isLuzOnList, toggleLuz, 'Iluminación', Icons.lightbulb);
-            } else if (index < 6) {
-              return _buildCard(index - 3, _isVentilacionOnList,
-                  toggleVentilacion, 'Ventilación', Icons.ac_unit);
-            } else if (index < 9) {
-              return _buildCard(
-                  index - 6, _isRiegoOnList, toggleRiego, 'Sistema de Riego', Icons.local_florist);
-            } else if (index < 12) {
-              return _buildCard(index - 9, _isSensoresTemperaturaOnList,
-                  toggleSensoresTemperatura, 'Temperatura', Icons.thermostat);
-            } else {
-              return _buildCard(index - 12, _isHumedadOnList,
-                  toggleHumedad, 'Humedad', Icons.water_drop);
-            }
-          },
+        ),
+        centerTitle: true, // Centrar el título en el medio
+      ),
+      body: Padding(
+        padding: EdgeInsets.all(20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _buildCard(
+              'Iluminación',
+              _isLuzOnList,
+              Icons.lightbulb,
+              toggleLuz,
+            ),
+            _buildCard(
+              'Ventilación',
+              _isVentilacionOnList,
+              Icons.ac_unit,
+              toggleVentilacion,
+            ),
+            _buildCard(
+              'Sistema de Riego',
+              _isRiegoOnList,
+              Icons.local_florist,
+              toggleRiego,
+            ),
+            _buildSensorCard('Temperatura', _temperaturaValue),
+            _buildSensorCard('Humedad', _humedadValue),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildCard(int index, List<bool> stateList, Function toggleFunction,
-      String category, IconData icon) {
-    final isOn = stateList[index];
-
+  Widget _buildCard(
+    String category,
+    List<dynamic> dataList,
+    IconData icon,
+    Function toggleFunction,
+  ) {
     return Card(
-      elevation: 3.4,
-      margin: EdgeInsets.all(12.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          isOn
-              ? Icon(
-                  icon,
-                  size: 78.0,
-                  color: Colors.greenAccent,
-                )
-              : Icon(
-                  icon,
-                  size: 78.0,
-                  color: const Color.fromARGB(255, 0, 0, 0),
-                ),
-          SizedBox(height: 10.0),
-          Text(category),
-          category == 'Temperatura'
-              ? Text(
-                  'Temperatura: ${_temperaturaValues[index]}°C',
-                  style: TextStyle(fontSize: 22),
-                )
-              : SizedBox(),
-          category == 'Humedad'
-              ? Text(
-                  'Humedad: ${_humedadValues[index]}%',
-                  style: TextStyle(fontSize: 22),
-                )
-              : SizedBox(),
-          Switch(
-            value: isOn,
-            onChanged: (value) => toggleFunction(index, value),
-          ),
-        ],
+      color: Colors.white,
+      shadowColor: Colors.black,
+      elevation: 10,
+      child: Padding(
+        padding: EdgeInsets.all(20.0),
+        child: Column(
+          children: [
+            Text(
+              category,
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 7.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                for (int index = 0; index < 3; index++)
+                  _buildSwitchWidget(
+                    index,
+                    dataList,
+                    toggleFunction,
+                    category,
+                    icon,
+                  ),
+              ],
+            ),
+          ],
+        ),
       ),
+    );
+  }
+
+  Widget _buildSensorCard(String category, double value) {
+    return Card(
+      color: Colors.white,
+      shadowColor: Colors.black,
+      elevation: 10,
+      child: Padding(
+        padding: EdgeInsets.all(40.0),
+        child: Column(
+          children: [
+            Text(
+              category,
+              style: TextStyle(
+                fontSize: 30,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 13.0),
+            Text(
+              '$category: $value',
+              style: TextStyle(
+                fontSize: 18,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSwitchWidget(int index, List<dynamic> stateList,
+      Function toggleFunction, String category, IconData icon) {
+    final isOn = stateList[index];
+    return Column(
+      children: [
+        isOn
+            ? Icon(
+                icon,
+                size: 65.0,
+                color: Colors.green,
+              )
+            : Icon(
+                icon,
+                size: 65.0,
+                color: Colors.black,
+              ),
+        SizedBox(height: 10.0),
+        Text(category),
+        Switch(
+          value: isOn,
+          onChanged: (value) => toggleFunction(index, value),
+        ),
+      ],
     );
   }
 }
