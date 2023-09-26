@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:invernadero/pantallas/camas.dart';
+import 'package:invernadero/Pantalla_Noconectadas/pantallas/camas.dart';
 
 class Animacion extends StatefulWidget {
   const Animacion({Key? key}) : super(key: key);

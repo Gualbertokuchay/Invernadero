@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:invernadero/conexiones/Riego_conexion.dart';
+import 'package:invernadero/Pantalla_Noconectadas/conexiones/Riego_conexion.dart';
 
-import 'package:invernadero/conexiones/Temperatura_conexion.dart';
-import 'package:invernadero/conexiones/conexion_ventiladores.dart';
-import 'package:invernadero/conexiones/Conexion_Iluminacion.dart';
+import 'package:invernadero/Pantalla_Noconectadas/conexiones/Temperatura_conexion.dart';
+import 'package:invernadero/Pantalla_Noconectadas/conexiones/conexion_ventiladores.dart';
+import 'package:invernadero/Pantalla_Noconectadas/conexiones/Conexion_Iluminacion.dart';
 
 Card formato_card(BuildContext context) {
   return Card(
